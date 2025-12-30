@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 function HomeScreen() {
+  const navigate = useNavigate()
   const [usernameOrEmail, setUsernameOrEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -18,7 +19,8 @@ function HomeScreen() {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false)
-      alert('Sign-in functionality will be implemented soon!')
+      // Redirect to dashboard after successful sign-in
+      navigate('/dashboard')
     }, 1000)
   }
 
@@ -124,12 +126,12 @@ function HomeScreen() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Don't have an account?{' '}
-              <a
-                href="#"
+              <Link
+                to="/register"
                 className="text-primary-600 hover:text-primary-700 font-semibold"
               >
                 Sign up
-              </a>
+              </Link>
             </p>
           </div>
         </div>
