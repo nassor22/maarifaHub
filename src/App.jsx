@@ -6,6 +6,10 @@ import Dashboard from './components/Dashboard'
 import CreatePost from './components/CreatePost'
 import ExpertVerification from './components/ExpertVerification'
 import PostDetail from './components/PostDetail'
+import Questions from './components/Questions'
+import Jobs from './components/Jobs'
+import Experts from './components/Experts'
+import Messages from './components/Messages'
 
 function App() {
   return (
@@ -18,6 +22,10 @@ function App() {
         <Route path="/create-post" element={<CreatePost />} />
         <Route path="/verify" element={<ExpertVerification />} />
         <Route path="/post/:id" element={<PostDetail />} />
+        <Route path="/questions" element={<Questions />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/experts" element={<Experts />} />
+        <Route path="/messages" element={<Messages />} />
       </Routes>
     </Router>
   )

@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { 
   HomeIcon, 
   QuestionMarkCircleIcon, 
@@ -8,7 +8,9 @@ import {
   ChatBubbleLeftRightIcon,
   BellIcon,
   Cog6ToothIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  Bars3Icon,
+  XMarkIcon
 } from '@heroicons/react/24/outline'
 import {
   HeartIcon,
@@ -23,6 +25,8 @@ import {
 } from '@heroicons/react/24/solid'
 
 function Dashboard() {
+  const navigate = useNavigate()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [user] = useState({
     username: 'johndoe',
     email: 'john@example.com',
@@ -30,6 +34,52 @@ function Dashboard() {
     reputation: 245,
     isVerified: false
   })
+
+  const [recentPosts, setRecentPosts] = useState([])
+
+  // Load posts from localStorage on component mount
+  useEffect(() => {
+    const loadPosts = () => {
+      const userPosts = JSON.parse(localStorage.getItem('userPosts') || '[]')
+      const mockPosts = [
+        {
+          id: 1,
+          type: 'question',
+          title: 'What are the best practices for diabetes management?',
+          author: 'healthseeker',
+          category: 'Health & Well-being',
+          replies: 12,
+          upvotes: 24,
+          time: '2 hours ago'
+        },
+        {
+          id: 2,
+          type: 'knowledge',
+          title: 'Understanding Climate-Smart Agriculture in East Africa',
+          author: 'Dr. Amina K.',
+          category: 'Agriculture & Environment',
+          replies: 8,
+          upvotes: 45,
+          time: '4 hours ago',
+          isExpert: true
+        },
+        {
+          id: 3,
+          type: 'information',
+          title: 'New Fintech Regulations in Kenya',
+          author: 'financeexpert',
+          category: 'Finance & Business',
+          replies: 15,
+          upvotes: 38,
+          time: '6 hours ago'
+        }
+      ]
+      // Combine user posts with mock posts
+      setRecentPosts([...userPosts, ...mockPosts])
+    }
+    
+    loadPosts()
+  }, [])
 
   const categories = [
     { name: 'Health & Well-being', icon: HeartIcon, color: 'text-green-600', posts: 1234 },
@@ -41,40 +91,6 @@ function Dashboard() {
     { name: 'Religion & Ethics', icon: BookOpenIcon, color: 'text-amber-600', posts: 345 },
     { name: 'Community Development', icon: UsersIcon, color: 'text-pink-600', posts: 234 },
     { name: 'Sports & Entertainment', icon: TrophyIcon, color: 'text-orange-600', posts: 678 }
-  ]
-
-  const recentPosts = [
-    {
-      id: 1,
-      type: 'question',
-      title: 'What are the best practices for diabetes management?',
-      author: 'healthseeker',
-      category: 'Health & Well-being',
-      replies: 12,
-      upvotes: 24,
-      time: '2 hours ago'
-    },
-    {
-      id: 2,
-      type: 'knowledge',
-      title: 'Understanding Climate-Smart Agriculture in East Africa',
-      author: 'Dr. Amina K.',
-      category: 'Agriculture & Environment',
-      replies: 8,
-      upvotes: 45,
-      time: '4 hours ago',
-      isExpert: true
-    },
-    {
-      id: 3,
-      type: 'information',
-      title: 'New Fintech Regulations in Kenya',
-      author: 'financeexpert',
-      category: 'Finance & Business',
-      replies: 15,
-      upvotes: 38,
-      time: '6 hours ago'
-    }
   ]
 
   const getPostTypeColor = (type) => {
@@ -93,7 +109,15 @@ function Dashboard() {
       <nav className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
+            <div className="flex items-center space-x-3">
+              {/* Hamburger Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+                aria-label="Toggle menu"
+              >
+                <Bars3Icon className="h-6 w-6" />
+              </button>
               <h1 className="text-2xl font-bold text-primary-700">MaarifaHub</h1>
             </div>
             
@@ -119,56 +143,92 @@ function Dashboard() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-4 space-y-1">
-              <Link to="/dashboard" className="flex items-center space-x-3 px-3 py-2 rounded-lg bg-primary-50 text-primary-700">
+      {/* Slide-out Menu */}
+      {isMobileMenuOpen && (
+        <>
+          {/* Overlay */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
+            onClick={() => setIsMobileMenuOpen(false)}
+          ></div>
+          
+          {/* Menu Panel */}
+          <div className="fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-xl font-bold text-primary-700">Menu</h2>
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100"
+              >
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <nav className="p-4 space-y-2">
+              <Link
+                to="/dashboard"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center space-x-3 px-3 py-3 rounded-lg bg-primary-50 text-primary-700 hover:bg-primary-100 transition-colors"
+              >
                 <HomeIcon className="h-5 w-5" />
                 <span className="font-medium">Home</span>
               </Link>
-              <Link to="/questions" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50">
+              
+              <Link
+                to="/questions"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+              >
                 <QuestionMarkCircleIcon className="h-5 w-5" />
                 <span>Questions</span>
               </Link>
-              <Link to="/jobs" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50">
+              
+              <Link
+                to="/jobs"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+              >
                 <BriefcaseIcon className="h-5 w-5" />
                 <span>Jobs</span>
               </Link>
-              <Link to="/experts" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50">
+              
+              <Link
+                to="/experts"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+              >
                 <UserGroupIcon className="h-5 w-5" />
                 <span>Find Experts</span>
               </Link>
-              <Link to="/messages" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50">
+              
+              <Link
+                to="/messages"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+              >
                 <ChatBubbleLeftRightIcon className="h-5 w-5" />
                 <span>Messages</span>
               </Link>
-              <Link to="/" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 mt-4 border-t pt-4">
-                <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                <span>Sign Out</span>
-              </Link>
-            </div>
-
-            {/* Verification Card */}
-            {!user.isVerified && user.role.includes('expert') && (
-              <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4">
-                <h3 className="font-semibold text-amber-900 mb-2">Verify Your Expertise</h3>
-                <p className="text-sm text-amber-800 mb-3">
-                  Complete verification to unlock expert features
-                </p>
-                <Link 
-                  to="/verify" 
-                  className="block text-center bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium py-2 px-4 rounded-lg"
+              
+              <div className="pt-4 mt-4 border-t">
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false)
+                    navigate('/')
+                  }}
+                  className="flex items-center space-x-3 px-3 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors w-full"
                 >
-                  Start Verification
-                </Link>
+                  <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                  <span className="font-medium">Sign Out</span>
+                </button>
               </div>
-            )}
+            </nav>
           </div>
+        </>
+      )}
 
-          {/* Main Content */}
-          <div className="lg:col-span-3 space-y-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-6">
             {/* Create Post */}
             <div className="bg-white rounded-lg shadow-sm p-4">
               <Link 
@@ -234,7 +294,6 @@ function Dashboard() {
                 ))}
               </div>
             </div>
-          </div>
         </div>
       </div>
     </div>

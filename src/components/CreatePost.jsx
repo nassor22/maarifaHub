@@ -44,15 +44,36 @@ function CreatePost() {
     e.preventDefault()
     setIsLoading(true)
     
-    // TODO: Implement actual post creation API call
-    console.log('Creating post:', formData)
+    // Get current user (for now, use a demo user)
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{"username": "You", "id": 1}')
+    
+    // Create new post object
+    const newPost = {
+      id: Date.now(),
+      type: formData.postType,
+      title: formData.title,
+      author: currentUser.username,
+      category: formData.category,
+      content: formData.content,
+      tags: formData.tags.split(',').map(t => t.trim()).filter(t => t),
+      replies: 0,
+      upvotes: 0,
+      time: 'Just now',
+      isExpert: false
+    }
+    
+    // Save to localStorage
+    const existingPosts = JSON.parse(localStorage.getItem('userPosts') || '[]')
+    existingPosts.unshift(newPost) // Add to beginning of array
+    localStorage.setItem('userPosts', JSON.stringify(existingPosts))
+    
+    console.log('Post created:', newPost)
     
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false)
-      alert('Post created successfully!')
       navigate('/dashboard')
-    }, 1500)
+    }, 500)
   }
 
   return (
