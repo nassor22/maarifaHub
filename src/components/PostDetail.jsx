@@ -20,12 +20,13 @@ function PostDetail() {
   const [commentContent, setCommentContent] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Mock data - will be fetched from API
-  const post = {
-    id: parseInt(id),
-    type: 'question',
-    title: 'What are the best practices for diabetes management in Kenya?',
-    content: `I'm a 45-year-old recently diagnosed with Type 2 diabetes. My doctor has given me some basic guidelines, but I'd like to hear from others about:
+  // Mock database of posts
+  const allPosts = {
+    1: {
+      id: 1,
+      type: 'question',
+      title: 'What are the best practices for diabetes management in Kenya?',
+      content: `I'm a 45-year-old recently diagnosed with Type 2 diabetes. My doctor has given me some basic guidelines, but I'd like to hear from others about:
 
 1. Effective dietary changes that work with local Kenyan foods
 2. Exercise routines that fit busy work schedules
@@ -33,74 +34,241 @@ function PostDetail() {
 4. Support groups or resources in Nairobi
 
 Any advice would be greatly appreciated. Thank you!`,
-    author: {
-      id: 123,
-      username: 'healthseeker',
-      isVerified: false,
-      reputation: 85
+      author: {
+        id: 123,
+        username: 'healthseeker',
+        isVerified: false,
+        reputation: 85
+      },
+      category: {
+        id: 1,
+        name: 'Health & Well-being'
+      },
+      tags: ['diabetes', 'health', 'kenya', 'nutrition'],
+      upvotes: 24,
+      downvotes: 1,
+      userVote: null,
+      viewCount: 345,
+      commentCount: 8,
+      createdAt: '2 hours ago',
+      updatedAt: null
     },
-    category: {
-      id: 1,
-      name: 'Health & Well-being'
-    },
-    tags: ['diabetes', 'health', 'kenya', 'nutrition'],
-    upvotes: 24,
-    downvotes: 1,
-    userVote: null, // 1, -1, or null
-    viewCount: 345,
-    commentCount: 8,
-    createdAt: '2 hours ago',
-    updatedAt: null
-  }
+    2: {
+      id: 2,
+      type: 'knowledge',
+      title: 'Understanding Climate-Smart Agriculture in East Africa',
+      content: `Climate-smart agriculture is becoming increasingly important in East Africa. Here's what you need to know:
 
-  const comments = [
-    {
-      id: 1,
+**Key Principles:**
+1. Increasing agricultural productivity and incomes
+2. Adapting and building resilience to climate change
+3. Reducing greenhouse gas emissions
+
+**Practical Applications:**
+- Conservation agriculture techniques
+- Crop diversification strategies
+- Water harvesting and irrigation methods
+- Agroforestry integration
+
+Research shows that farmers who adopt these practices see 30-40% improvement in yields while reducing environmental impact.`,
       author: {
         id: 456,
         username: 'Dr. Amina K.',
         isVerified: true,
         reputation: 1850
       },
-      content: 'As a medical professional specializing in diabetes care, I can provide some guidance. First, incorporating ugali made from whole grain flour, sukuma wiki, and beans can help manage blood sugar levels. These are affordable and locally available. Regular monitoring is crucial - you can find affordable glucometers at most pharmacies...',
-      upvotes: 18,
-      downvotes: 0,
+      category: {
+        id: 2,
+        name: 'Agriculture & Environment'
+      },
+      tags: ['agriculture', 'climate', 'environment', 'sustainability'],
+      upvotes: 45,
+      downvotes: 2,
       userVote: null,
-      isAcceptedAnswer: true,
-      replies: [
-        {
-          id: 2,
-          author: {
-            id: 123,
-            username: 'healthseeker',
-            isVerified: false,
-            reputation: 85
-          },
-          content: 'Thank you so much Dr. Amina! This is very helpful. Do you have any specific recommendations for glucometers?',
-          upvotes: 3,
-          downvotes: 0,
-          createdAt: '1 hour ago'
-        }
-      ],
-      createdAt: '1 hour ago'
+      viewCount: 567,
+      commentCount: 8,
+      createdAt: '4 hours ago',
+      updatedAt: null
     },
-    {
+    3: {
       id: 3,
+      type: 'information',
+      title: 'New Fintech Regulations in Kenya - What You Need to Know',
+      content: `The Central Bank of Kenya has introduced new regulations affecting digital lenders and mobile money services. Here's a comprehensive breakdown:
+
+**Key Changes:**
+1. Interest rate caps on digital loans
+2. Enhanced consumer protection measures
+3. Stricter licensing requirements for fintech companies
+4. New data privacy requirements
+
+**Impact on Consumers:**
+- More transparent lending terms
+- Better dispute resolution mechanisms
+- Protection against predatory lending
+
+**Timeline:**
+All fintech companies must comply by June 2026.
+
+These regulations aim to balance innovation with consumer protection in Kenya's rapidly growing digital finance sector.`,
       author: {
         id: 789,
-        username: 'livingwellkenya',
-        isVerified: false,
-        reputation: 420
+        username: 'financeexpert',
+        isVerified: true,
+        reputation: 920
       },
-      content: 'I\'ve been managing diabetes for 3 years now. The Diabetes Kenya support group has monthly meetups in Nairobi. They\'ve been incredibly helpful for emotional support and practical tips.',
-      upvotes: 12,
-      downvotes: 0,
+      category: {
+        id: 3,
+        name: 'Finance & Business'
+      },
+      tags: ['fintech', 'regulations', 'kenya', 'digital-lending'],
+      upvotes: 38,
+      downvotes: 3,
       userVote: null,
-      isAcceptedAnswer: false,
-      replies: [],
-      createdAt: '30 minutes ago'
+      viewCount: 423,
+      commentCount: 15,
+      createdAt: '6 hours ago',
+      updatedAt: null
     }
-  ]
+  }
+
+  // Get the specific post or use a default
+  const post = allPosts[id] || allPosts[1]
+
+  const commentsData = {
+    1: [
+      {
+        id: 1,
+        author: {
+          id: 456,
+          username: 'Dr. Amina K.',
+          isVerified: true,
+          reputation: 1850
+        },
+        content: 'As a medical professional specializing in diabetes care, I can provide some guidance. First, incorporating ugali made from whole grain flour, sukuma wiki, and beans can help manage blood sugar levels. These are affordable and locally available. Regular monitoring is crucial - you can find affordable glucometers at most pharmacies...',
+        upvotes: 18,
+        downvotes: 0,
+        userVote: null,
+        isAcceptedAnswer: true,
+        replies: [
+          {
+            id: 2,
+            author: {
+              id: 123,
+              username: 'healthseeker',
+              isVerified: false,
+              reputation: 85
+            },
+            content: 'Thank you so much Dr. Amina! This is very helpful. Do you have any specific recommendations for glucometers?',
+            upvotes: 3,
+            downvotes: 0,
+            createdAt: '1 hour ago'
+          }
+        ],
+        createdAt: '1 hour ago'
+      },
+      {
+        id: 3,
+        author: {
+          id: 789,
+          username: 'livingwellkenya',
+          isVerified: false,
+          reputation: 420
+        },
+        content: 'I\'ve been managing diabetes for 3 years now. The Diabetes Kenya support group has monthly meetups in Nairobi. They\'ve been incredibly helpful for emotional support and practical tips.',
+        upvotes: 12,
+        downvotes: 0,
+        userVote: null,
+        isAcceptedAnswer: false,
+        replies: [],
+        createdAt: '30 minutes ago'
+      }
+    ],
+    2: [
+      {
+        id: 1,
+        author: {
+          id: 234,
+          username: 'farmerJohn',
+          isVerified: false,
+          reputation: 340
+        },
+        content: 'Great article! We\'ve implemented conservation agriculture on our farm in Nakuru and have seen amazing results. Soil quality has improved significantly and we\'re using 40% less water.',
+        upvotes: 15,
+        downvotes: 0,
+        userVote: null,
+        isAcceptedAnswer: false,
+        replies: [],
+        createdAt: '2 hours ago'
+      },
+      {
+        id: 2,
+        author: {
+          id: 567,
+          username: 'AgriResearcher',
+          isVerified: true,
+          reputation: 1240
+        },
+        content: 'Important to add that agroforestry integration can increase farm resilience by 60%. The combination of crops and trees creates a microclimate that protects against extreme weather events.',
+        upvotes: 22,
+        downvotes: 1,
+        userVote: null,
+        isAcceptedAnswer: true,
+        replies: [],
+        createdAt: '1 hour ago'
+      }
+    ],
+    3: [
+      {
+        id: 1,
+        author: {
+          id: 890,
+          username: 'techLawyer',
+          isVerified: true,
+          reputation: 1450
+        },
+        content: 'This is a comprehensive overview. I\'d add that the new regulations also require fintech companies to have physical offices in Kenya for customer service. This is a significant change from the previous purely digital model.',
+        upvotes: 25,
+        downvotes: 1,
+        userVote: null,
+        isAcceptedAnswer: true,
+        replies: [
+          {
+            id: 2,
+            author: {
+              id: 789,
+              username: 'financeexpert',
+              isVerified: true,
+              reputation: 920
+            },
+            content: 'Good point! That\'s indeed one of the most significant operational changes.',
+            upvotes: 8,
+            downvotes: 0,
+            createdAt: '30 minutes ago'
+          }
+        ],
+        createdAt: '3 hours ago'
+      },
+      {
+        id: 3,
+        author: {
+          id: 345,
+          username: 'startupFounder',
+          isVerified: false,
+          reputation: 560
+        },
+        content: 'As a fintech founder, I appreciate the clarity these regulations bring. While compliance costs will increase, the consumer protection measures will help build trust in the industry long-term.',
+        upvotes: 18,
+        downvotes: 2,
+        userVote: null,
+        isAcceptedAnswer: false,
+        replies: [],
+        createdAt: '1 hour ago'
+      }
+    ]
+  }
+
+  const comments = commentsData[id] || []
 
   const handleVote = (value) => {
     console.log('Vote:', value)

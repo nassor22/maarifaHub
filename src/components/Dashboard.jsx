@@ -113,7 +113,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Top Navigation */}
-      <nav className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
+      <nav className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
@@ -128,33 +128,56 @@ function Dashboard() {
               <h1 className="text-2xl font-bold text-primary-700 dark:text-primary-400">MaarifaHub</h1>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-2">
               <button 
                 onClick={() => setIsSearchModalOpen(true)}
-                className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                type="button"
+                className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer select-none"
                 aria-label="Search categories"
               >
-                <MagnifyingGlassIcon className="h-6 w-6" />
+                <MagnifyingGlassIcon className="h-6 w-6 pointer-events-none" />
               </button>
               <button
                 onClick={toggleDarkMode}
-                className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95"
+                type="button"
+                className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95 cursor-pointer select-none"
                 aria-label="Toggle dark mode"
               >
-                {darkMode ? <SunIcon className="h-6 w-6" /> : <MoonIcon className="h-6 w-6" />}
+                {darkMode ? <SunIcon className="h-6 w-6 pointer-events-none" /> : <MoonIcon className="h-6 w-6 pointer-events-none" />}
               </button>
-              <Link to="/notifications" className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 relative">
-                <BellIcon className="h-6 w-6" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              <Link 
+                to="/notifications"
+                className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 relative inline-flex items-center justify-center cursor-pointer select-none"
+                aria-label="View notifications"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <BellIcon className="h-6 w-6 pointer-events-none" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full pointer-events-none"></span>
               </Link>
-              <Link to="/settings" className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                <Cog6ToothIcon className="h-6 w-6" />
+              <Link 
+                to="/settings"
+                className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 inline-flex items-center justify-center cursor-pointer select-none"
+                aria-label="Settings"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <Cog6ToothIcon className="h-6 w-6 pointer-events-none" />
               </Link>
-              <Link to="/profile" className="flex items-center space-x-2 pl-3 border-l dark:border-gray-700 hover:opacity-80 transition-opacity">
-                <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold">
+              <Link 
+                to="/profile"
+                className="flex items-center space-x-2 pl-3 ml-1 border-l dark:border-gray-700 hover:opacity-80 transition-opacity cursor-pointer select-none"
+                aria-label="View profile"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold pointer-events-none">
                   {user.username[0].toUpperCase()}
                 </div>
-                <div className="hidden sm:block">
+                <div className="hidden sm:block pointer-events-none">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">{user.username}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">⭐ {user.reputation} reputation</p>
                 </div>
@@ -169,12 +192,12 @@ function Dashboard() {
         <>
           {/* Overlay */}
           <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
+            className="fixed inset-0 bg-black bg-opacity-50 z-[45] transition-opacity"
             onClick={() => setIsMobileMenuOpen(false)}
           ></div>
           
           {/* Menu Panel */}
-          <div className="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-xl z-50 transform transition-transform duration-300 ease-in-out">
+          <div className="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-xl z-[60] transform transition-transform duration-300 ease-in-out">
             <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
               <h2 className="text-xl font-bold text-primary-700 dark:text-primary-400">Menu</h2>
               <button
@@ -252,11 +275,11 @@ function Dashboard() {
       {isSearchModalOpen && (
         <>
           <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity"
+            className="fixed inset-0 bg-black bg-opacity-50 z-[55] transition-opacity"
             onClick={() => setIsSearchModalOpen(false)}
           ></div>
           
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-y-auto transform transition-all">
               <div className="sticky top-0 bg-white dark:bg-gray-800 border-b dark:border-gray-700 rounded-t-2xl">
                 <div className="p-6 flex items-center justify-between">

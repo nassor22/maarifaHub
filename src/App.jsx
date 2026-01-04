@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import LoadingScreen from './components/LoadingScreen'
 import HomeScreen from './components/HomeScreen'
 import ForgotPassword from './components/ForgotPassword'
 import Register from './components/Register'
@@ -15,6 +17,30 @@ import Notifications from './components/Notifications'
 import Profile from './components/Profile'
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    // Check if this is the first load
+    const hasLoadedBefore = sessionStorage.getItem('hasLoadedBefore')
+    
+    if (!hasLoadedBefore) {
+      // First time loading, show splash screen
+      setIsLoading(true)
+    } else {
+      // Already loaded once in this session, skip splash
+      setIsLoading(false)
+    }
+  }, [])
+
+  const handleLoadingComplete = () => {
+    sessionStorage.setItem('hasLoadedBefore', 'true')
+    setIsLoading(false)
+  }
+
+  if (isLoading) {
+    return <LoadingScreen onLoadingComplete={handleLoadingComplete} />
+  }
+
   return (
     <Router>
       <Routes>

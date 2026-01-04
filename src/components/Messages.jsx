@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { 
   HomeIcon, 
@@ -29,8 +29,12 @@ function Messages() {
 
   const [selectedChat, setSelectedChat] = useState(1)
   const [messageText, setMessageText] = useState('')
+  const [showNotifications, setShowNotifications] = useState(false)
+  const messagesEndRef = useRef(null)
+  const notificationRef = useRef(null)
 
-  const conversations = [
+  // State for conversations and messages
+  const [conversations, setConversations] = useState([
     {
       id: 1,
       name: 'Dr. Amina Kamau',
@@ -52,38 +56,202 @@ function Messages() {
       time: '1d ago',
       unread: 1
     }
-  ]
+  ])
 
-  const messages = [
+  const [chatMessages, setChatMessages] = useState({
+    1: [
+      {
+        id: 1,
+        sender: 'Dr. Amina Kamau',
+        text: 'Hello! I saw your question about diabetes management.',
+        time: '10:30 AM',
+        isOwn: false
+      },
+      {
+        id: 2,
+        sender: 'You',
+        text: 'Hi! Yes, I would appreciate your expert advice.',
+        time: '10:35 AM',
+        isOwn: true
+      },
+      {
+        id: 3,
+        sender: 'Dr. Amina Kamau',
+        text: 'Thank you for the follow-up question!',
+        time: '10:40 AM',
+        isOwn: false
+      }
+    ],
+    2: [
+      {
+        id: 1,
+        sender: 'Prof. James Omondi',
+        text: 'I can help you with that research topic.',
+        time: '9:15 AM',
+        isOwn: false
+      }
+    ],
+    3: [
+      {
+        id: 1,
+        sender: 'Mary Wanjiru',
+        text: 'Here are some resources that might help',
+        time: 'Yesterday',
+        isOwn: false
+      }
+    ]
+  })
+
+  // Get current chat messages
+  const messages = chatMessages[selectedChat] || []
+
+  // Sample notifications
+  const notifications = [
     {
       id: 1,
-      sender: 'Dr. Amina Kamau',
-      text: 'Hello! I saw your question about diabetes management.',
-      time: '10:30 AM',
-      isOwn: false
+      type: 'message',
+      text: 'Dr. Amina Kamau replied to your message',
+      time: '5 min ago',
+      unread: true
     },
     {
       id: 2,
-      sender: 'You',
-      text: 'Hi! Yes, I would appreciate your expert advice.',
-      time: '10:35 AM',
-      isOwn: true
+      type: 'answer',
+      text: 'Your question received a new answer',
+      time: '1 hour ago',
+      unread: true
     },
     {
       id: 3,
-      sender: 'Dr. Amina Kamau',
-      text: 'Thank you for the follow-up question!',
-      time: '10:40 AM',
-      isOwn: false
+      type: 'upvote',
+      text: 'Your answer was upvoted',
+      time: '3 hours ago',
+      unread: false
     }
   ]
+
+  // Close notification dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setShowNotifications(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  // Format current time
+  const getCurrentTime = () => {
+    const now = new Date()
+    return now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+  }
 
   const handleSendMessage = (e) => {
     e.preventDefault()
     if (messageText.trim()) {
-      // Add message sending logic here
+      const currentTime = getCurrentTime()
+      
+      // Create new message
+      const newMessage = {
+        id: messages.length + 1,
+        sender: 'You',
+        text: messageText.trim(),
+        time: currentTime,
+        isOwn: true
+      }
+
+      // Update chat messages
+      setChatMessages(prev => ({
+        ...prev,
+        [selectedChat]: [...(prev[selectedChat] || []), newMessage]
+      }))
+
+      // Update conversation list with last message
+      setConversations(prev => prev.map(conv => {
+        if (conv.id === selectedChat) {
+          return {
+            ...conv,
+            lastMessage: messageText.trim(),
+            time: 'Just now'
+          }
+        }
+        return conv
+      }))
+
+      // Clear input
       setMessageText('')
+
+      // Simulate receiving a response after 2-3 seconds
+      setTimeout(() => {
+        simulateResponse()
+      }, 2000 + Math.random() * 1000)
     }
+  }
+
+  const simulateResponse = () => {
+    const responses = [
+      "That's a great question! Let me provide you with some information.",
+      "I understand your concern. Here's what I recommend...",
+      "Thank you for reaching out. I'll be happy to help with that.",
+      "That's an interesting perspective. Have you considered...",
+      "I appreciate your follow-up. Here are some additional resources.",
+      "Great to hear from you! Let's discuss this further."
+    ]
+    
+    const randomResponse = responses[Math.floor(Math.random() * responses.length)]
+    const currentTime = getCurrentTime()
+    const selectedConv = conversations.find(c => c.id === selectedChat)
+
+    const responseMessage = {
+      id: (chatMessages[selectedChat]?.length || 0) + 1,
+      sender: selectedConv?.name || 'Expert',
+      text: randomResponse,
+      time: currentTime,
+      isOwn: false
+    }
+
+    // Add response message
+    setChatMessages(prev => ({
+      ...prev,
+      [selectedChat]: [...(prev[selectedChat] || []), responseMessage]
+    }))
+
+    // Update conversation list
+    setConversations(prev => prev.map(conv => {
+      if (conv.id === selectedChat) {
+        return {
+          ...conv,
+          lastMessage: randomResponse,
+          time: 'Just now',
+          unread: conv.unread + 1
+        }
+      }
+      return conv
+    }))
+  }
+
+  // Mark messages as read when opening a chat
+  const handleSelectChat = (chatId) => {
+    setSelectedChat(chatId)
+    
+    // Mark as read
+    setConversations(prev => prev.map(conv => {
+      if (conv.id === chatId) {
+        return { ...conv, unread: 0 }
+      }
+      return conv
+    }))
   }
 
   return (
@@ -108,14 +276,50 @@ function Messages() {
               >
                 {darkMode ? <SunIcon className="h-6 w-6" /> : <MoonIcon className="h-6 w-6" />}
               </button>
-              <button className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 relative">
-                <BellIcon className="h-6 w-6" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
+              
+              <div className="relative" ref={notificationRef}>
+                <button 
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 relative"
+                >
+                  <BellIcon className="h-6 w-6" />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+
+                {showNotifications && (
+                  <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 z-50 max-h-96 overflow-y-auto">
+                    <div className="p-4 border-b dark:border-gray-700">
+                      <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
+                    </div>
+                    <div>
+                      {notifications.map((notif) => (
+                        <div
+                          key={notif.id}
+                          className={`p-4 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer ${
+                            notif.unread ? 'bg-blue-50 dark:bg-blue-900/10' : ''
+                          }`}
+                        >
+                          <p className="text-sm text-gray-900 dark:text-white">{notif.text}</p>
+                          <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">{notif.time}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <Link
+                      to="/notifications"
+                      onClick={() => setShowNotifications(false)}
+                      className="block p-3 text-center text-sm text-primary-600 dark:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium"
+                    >
+                      View all notifications
+                    </Link>
+                  </div>
+                )}
+              </div>
+
               <Link to="/settings" className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                 <Cog6ToothIcon className="h-6 w-6" />
               </Link>
-              <div className="flex items-center space-x-2 pl-3 border-l dark:border-gray-700">
+              
+              <Link to="/profile" className="flex items-center space-x-2 pl-3 border-l dark:border-gray-700 hover:opacity-80 transition-opacity">
                 <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold">
                   {user.username[0].toUpperCase()}
                 </div>
@@ -123,7 +327,7 @@ function Messages() {
                   <p className="text-sm font-medium text-gray-900 dark:text-white">{user.username}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">⭐ {user.reputation} reputation</p>
                 </div>
-              </div>
+              </Link>
             </div>
           </div>
         </div>
@@ -224,9 +428,9 @@ function Messages() {
                 {conversations.map((conv) => (
                   <div
                     key={conv.id}
-                    onClick={() => setSelectedChat(conv.id)}
-                    className={`p-4 border-b dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ${
-                      selectedChat === conv.id ? 'bg-primary-50' : ''
+                    onClick={() => handleSelectChat(conv.id)}
+                    className={`p-4 border-b dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                      selectedChat === conv.id ? 'bg-primary-50 dark:bg-primary-900/20' : ''
                     }`}
                   >
                     <div className="flex items-start justify-between">
@@ -257,27 +461,39 @@ function Messages() {
               </div>
               
               <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ height: 'calc(600px - 145px)' }}>
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        msg.isOwn
-                          ? 'bg-primary-600 text-white'
-                          : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
-                      }`}
-                    >
-                      <p>{msg.text}</p>
-                      <span className={`text-xs mt-1 block ${
-                        msg.isOwn ? 'text-primary-100' : 'text-gray-600 dark:text-gray-400'
-                      }`}>
-                        {msg.time}
-                      </span>
-                    </div>
+                {messages.length === 0 ? (
+                  <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
+                    <p>No messages yet. Start a conversation!</p>
                   </div>
-                ))}
+                ) : (
+                  <>
+                    {messages.map((msg) => (
+                      <div
+                        key={msg.id}
+                        className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'} animate-fadeIn`}
+                      >
+                        <div
+                          className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                            msg.isOwn
+                              ? 'bg-primary-600 text-white'
+                              : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+                          }`}
+                        >
+                          {!msg.isOwn && (
+                            <p className="text-xs font-semibold mb-1 opacity-70">{msg.sender}</p>
+                          )}
+                          <p>{msg.text}</p>
+                          <span className={`text-xs mt-1 block ${
+                            msg.isOwn ? 'text-primary-100' : 'text-gray-600 dark:text-gray-400'
+                          }`}>
+                            {msg.time}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                    <div ref={messagesEndRef} />
+                  </>
+                )}
               </div>
 
               <form onSubmit={handleSendMessage} className="p-4 border-t dark:border-gray-700">
@@ -291,7 +507,8 @@ function Messages() {
                   />
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                    disabled={!messageText.trim()}
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <PaperAirplaneIcon className="h-5 w-5" />
                   </button>
