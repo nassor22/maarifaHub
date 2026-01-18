@@ -55,7 +55,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=${VITE_API_URL}
+        - VITE_API_URL=https://maarifahub.social/api
     container_name: maarifahub-frontend-prod
     restart: always
     ports:

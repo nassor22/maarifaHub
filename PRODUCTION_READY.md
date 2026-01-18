@@ -128,7 +128,7 @@ chmod +x deploy.sh
 
 ### Frontend (.env)
 ```env
-VITE_API_URL=https://api.yourdomain.com/api
+VITE_API_URL=https://maarifahub.social/api
 VITE_APP_NAME=MaarifaHub
 VITE_APP_VERSION=1.0.0
 ```
@@ -140,7 +140,7 @@ NODE_ENV=production
 MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/maarifahub
 JWT_SECRET=your_secure_random_secret_key
 JWT_EXPIRE=7d
-CORS_ORIGIN=https://yourdomain.com
+CORS_ORIGIN=https://maarifahub.social
 ```
 
 ## 🧪 Testing Before Production

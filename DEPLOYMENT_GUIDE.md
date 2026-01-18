@@ -79,7 +79,7 @@ npm run deploy:build
 
 ```env
 # API URL - Point to your backend API
-VITE_API_URL=https://api.yourdomain.com/api
+VITE_API_URL=https://maarifahub.social/api
 
 # App Configuration
 VITE_APP_NAME=MaarifaHub
@@ -101,7 +101,7 @@ JWT_SECRET=your_super_secure_random_jwt_secret_key_here
 JWT_EXPIRE=7d
 
 # CORS
-CORS_ORIGIN=https://yourdomain.com
+CORS_ORIGIN=https://maarifahub.social
 ```
 
 ---
@@ -130,7 +130,7 @@ cp .env.docker.example .env.docker
 Edit the `VITE_API_URL` to match your domain:
 ```yaml
 environment:
-  - VITE_API_URL=https://yourdomain.com/api
+  - VITE_API_URL=https://maarifahub.social/api
 ```
 
 3. **Build and Run**
@@ -253,18 +253,18 @@ Create `/etc/nginx/sites-available/maarifahub`:
 # HTTP - Redirect to HTTPS
 server {
     listen 80;
-    server_name yourdomain.com www.yourdomain.com;
+    server_name maarifahub.social www.maarifahub.social;
     return 301 https://$server_name$request_uri;
 }
 
 # HTTPS
 server {
     listen 443 ssl http2;
-    server_name yourdomain.com www.yourdomain.com;
+    server_name maarifahub.social www.maarifahub.social;
 
     # SSL Configuration
-    ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/maarifahub.social/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/maarifahub.social/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers on;
@@ -328,7 +328,7 @@ sudo systemctl restart nginx
 sudo apt install certbot python3-certbot-nginx -y
 
 # Obtain certificate
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+sudo certbot --nginx -d maarifahub.social -d www.maarifahub.social
 
 # Auto-renewal is configured automatically
 # Test renewal:
@@ -400,7 +400,7 @@ git push heroku main
 curl https://yourdomain.com
 
 # Check backend health
-curl https://yourdomain.com/api/health
+curl https://maarifahub.social/api/health
 
 # Expected response:
 {

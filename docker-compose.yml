@@ -33,7 +33,7 @@ services:
       - MONGODB_URI=mongodb://admin:changeme@mongodb:27017/maarifahub?authSource=admin
       - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_change_in_production}
       - JWT_EXPIRE=7d
-      - CORS_ORIGIN=*
+      - CORS_ORIGIN=https://maarifahub.social
     depends_on:
       - mongodb
     networks:
@@ -51,7 +51,7 @@ services:
     ports:
       - "80:80"
     environment:
-      - VITE_API_URL=http://localhost:5000/api
+      - VITE_API_URL=https://maarifahub.social/api
     depends_on:
       - backend
     networks:

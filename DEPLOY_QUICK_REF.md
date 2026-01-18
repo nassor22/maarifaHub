@@ -81,7 +81,7 @@ pm2 stop maarifahub-api
 
 ### Frontend (.env)
 ```env
-VITE_API_URL=https://api.yourdomain.com/api
+VITE_API_URL=https://maarifahub.social/api
 ```
 
 ### Backend (server/.env)
@@ -89,7 +89,7 @@ VITE_API_URL=https://api.yourdomain.com/api
 NODE_ENV=production
 MONGODB_URI=mongodb+srv://user:pass@host/maarifahub
 JWT_SECRET=<generate-secure-key>
-CORS_ORIGIN=https://yourdomain.com
+CORS_ORIGIN=https://maarifahub.social
 ```
 
 ### Generate JWT Secret
