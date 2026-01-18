@@ -29,6 +29,10 @@ dist-ssr
 .env.production
 .env.development
 
+# Netlify
+.netlify
+netlify/functions/node_modules/
+
 # Build files
 build/
 *.tgz
